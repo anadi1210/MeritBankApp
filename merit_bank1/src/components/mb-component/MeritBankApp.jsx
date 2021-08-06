@@ -9,6 +9,7 @@ import ListToDoComponent from './ListToDoComponent.jsx';
 import WelcomeComponent from './WelcomeComponent.jsx';
 import LogoutComponent from './LogoutComponent.jsx';
 import ErrorComponent from './ErrorComponent.jsx';
+import RegisterComponent from './RegisterComponent';
 
 class MeritBankApp extends Component {
   render() {
@@ -22,6 +23,7 @@ class MeritBankApp extends Component {
             <Switch>
               <Route exact path="/" component={LoginComponent} />
               <Route exact path="/login" component={LoginComponent} />
+              <Route exact path="/register" component={RegisterComponent} />
               <AuthenticatedRoute exact path="/welcome/:name" component={WelcomeComponent} />
               <AuthenticatedRoute exact path="/todos" component={ListToDoComponent} />
               <AuthenticatedRoute exact path="/logout" component={LogoutComponent} />

@@ -19,6 +19,7 @@ class LoginComponent extends Component {
   
       this.handleChange = this.handleChange.bind(this);
       this.handleLoginButton = this.handleLoginButton.bind(this);
+      this.handleRegisterButton = this.handleRegisterButton.bind(this);
     }
   
     handleChange(event) {
@@ -73,6 +74,10 @@ class LoginComponent extends Component {
         }
          
     }
+
+    handleRegisterButton() {
+      this.props.history.push("/register");
+    }
     
     render() {
       return (
@@ -88,7 +93,8 @@ class LoginComponent extends Component {
   
               User Name : <input type="text" name="username" value={this.state.username} onChange={this.handleChange}/> <br/><br/>
               Password : <input type="password" name="password" value={this.state.password} onChange={this.handleChange}/> <br/><br/>
-              <button className="btn btn=s" onClick={this.handleLoginButton}>Login</button>
+              <button className="btn btn-success" onClick={this.handleLoginButton}>Login</button>
+              <button className="btn btn-success" onClick={this.handleRegisterButton}>New User ?</button>
             </div>
         </div>
       );
