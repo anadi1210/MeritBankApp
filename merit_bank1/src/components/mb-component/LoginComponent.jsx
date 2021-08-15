@@ -51,27 +51,42 @@ class LoginComponent extends Component {
   
     handleLoginButton(){ 
         // Hardcoded validation with username = anadi and password=123
-        if(this.state.username==='anadi' && this.state.password==='123'){
-          AuthenticationService.registerSuccessfulLogin(this.state.username,this.state.password );
-          this.props.history.push(`/welcome/${this.state.username}`)
+        // if(this.state.username==='anadi' && this.state.password==='123'){
+        //   AuthenticationService.registerSuccessfulLogin(this.state.username,this.state.password );
+        //   this.props.history.push(`/welcome/${this.state.username}`)
           
-          //console.log('login success')
-          // this.setState(
-          //   {
-          //     hasLoginFailed : false,
-          //     showSuccessMessage : true
-          //   }
-          //   )
-        }
-        else {
-          this.setState(
-            {
-              hasLoginFailed : true,
-              showSuccessMessage : false
+        //   //console.log('login success')
+        //   // this.setState(
+        //   //   {
+        //   //     hasLoginFailed : false,
+        //   //     showSuccessMessage : true
+        //   //   }
+        //   //   )
+        // }
+        // else {
+        //   this.setState(
+        //     {
+        //       hasLoginFailed : true,
+        //       showSuccessMessage : false
+        //     }
+        //     )
+        //   console.log('login failed')
+        // }
+
+        AuthenticationService
+        .executeJwtAuthenticationService(this.state.username, this.state.password)
+        .then((response) => {
+              AuthenticationService.registerSuccessfulLoginForJwt(this.state.username, response.data.token );
+              this.props.history.push(`/welcome/${this.state.username}`)    
             }
-            )
-          console.log('login failed')
-        }
+        ).catch( () => 
+        this.setState(
+          {
+            hasLoginFailed : true,
+            showSuccessMessage : false
+          }
+          )
+        )
          
     }
 
