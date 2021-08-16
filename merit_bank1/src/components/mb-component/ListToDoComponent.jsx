@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import MeritBankService from '../../api/merit-bank/MeritBankService';
 import moment from 'moment';
+import AuthenticationService from './AuthenticationService';
 
 class ListToDoComponent extends Component {
   
@@ -25,30 +26,55 @@ class ListToDoComponent extends Component {
           },
          cdAccounts : [],
          user_name : '',
-         welcomeMessage : ''
+         welcomeMessage : '',
+         hasCheckingAccount : false,
+         hasSavingsAccount : false,
+         hasCDAccount : false
       }
       this.handleError = this.handleError.bind(this);
+      this.addCheckingButton = this.addCheckingButton.bind(this)
+      this.addSavingsButton = this.addSavingsButton.bind(this)
+      this.addCDButton = this.addCDButton.bind(this)
+      this.handleDeposit = this.handleDeposit.bind(this)
+      this.handleWithdraw = this.handleWithdraw.bind(this)
+      this.handleTransfer = this.handleTransfer.bind(this)
+      this.handleDeleteAccount = this.handleDeleteAccount.bind(this)
     }
 
     componentDidMount() {
-        MeritBankService.retrieveAccountHolder()
+        const username = AuthenticationService.getLoggedInUsername()
+       
+        MeritBankService.retrieveAccountHolder(username)
         .then(
             response => {
               console.log(response)
               this.setState({
-                   accountHolder : response.data[0],
-                   checkingAccount : response.data[0].checkingAccount,
+                   accountHolder : response.data,
+                   checkingAccount : response.data.checkingAccount,
                   
-                   savingsAccount : response.data[0].savingsAccounts,
-                   cdAccounts : response.data[0].cdAccountsList,
-                  user_name : response.data[0].firstName
+                   savingsAccount : response.data.savingsAccounts,
+                   cdAccounts : response.data.cdAccountsList,
+                  user_name : response.data.firstName
               })
+
+              if(response.data.checkingAccount){
+                this.setState({hasCheckingAccount : true})
+              }
+              if(response.data.savingsAccounts){
+                this.setState({hasSavingsAccount : true})
+              }
+              if(response.data.cdAccountsList){
+                this.setState({hasCDAccount : true})
+              }
             }
            
         )
         .catch(error => this.handleError(error))
         
     }
+
+
+
     handleError(error) {
       console.log("This is error message :: "+error.message)
      
@@ -65,7 +91,36 @@ class ListToDoComponent extends Component {
       this.setState( { welcomeMessage : error.message } )
 
       }
+
+      addCheckingButton() {
+        this.props.history.push("/addCheckingAccount")
+      }
+
+      addSavingsButton(){
+        this.props.history.push("/addSavingsAccount")
+      }
+
+      addCDButton() {
+        this.props.history.push("/addCDAccount")
+      }
     
+      handleDeposit(event) {
+        let accountid = event.target.value
+        this.props.history.push(`/deposit/${accountid}`)
+      }
+      handleWithdraw(event) {
+        let accountid = event.target.value
+        this.props.history.push(`/withdraw/${accountid}`)
+      }
+      handleTransfer(event) {
+        let accountid = event.target.value
+        this.props.history.push(`/transfer/${accountid}`)
+      }
+      handleDeleteAccount(event) {
+        let accountid = event.target.value
+        
+      }
+
     render() {
       return (
             <div >
@@ -107,49 +162,67 @@ class ListToDoComponent extends Component {
                             //       <td><button className="btn btn-warning">Delete</button></td>
                             //     </tr>
                             // )
-                          
-                              <tr key={this.state.checkingAccount.checkingAccountId}>
+                          }  
+                            
+                            {
+                              this.state.hasCheckingAccount &&
+                              
+                              <tr key={this.state.checkingAccount.id}>
                                   <td>Checking Account</td>
                                   {/* <td>{this.state.user_name}</td> */}
                                  
                                   <td>{this.state.checkingAccount.balance}</td>
                                   <td>{moment(this.state.checkingAccount.openedOn).format('YYYY-MM-DD')}</td>
-                                  <td><button className="btn btn-success">Deposit</button></td>
-                                  <td><button className="btn btn-primary">Withdraw</button></td>
-                                  <td><button className="btn btn-warning">Transfer</button></td>
-                                  <td><button className="btn btn-danger">Delete</button></td>
+                                  <td><button className="btn btn-success" onClick={this.handleDeposit} value={this.state.checkingAccount.id}>Deposit</button></td>
+                                  <td><button className="btn btn-primary" onClick={this.handleWithdraw} value={this.state.checkingAccount.id}>Withdraw</button></td>
+                                  <td><button className="btn btn-warning" onClick={this.handleTransfer} value={this.state.checkingAccount.id}>Transfer</button></td>
+                                  <td><button className="btn btn-danger" onClick={this.handleDeleteAccount} value={this.state.checkingAccount.id}>Delete</button></td>
                               </tr>
                           
                          }
                           {
-                             <tr key={this.state.savingsAccount.savingsAccountId}>
+                            this.state.hasSavingsAccount && 
+                             <tr key={this.state.savingsAccount.id}>
                              <td>Savings Account</td>
                              {/* <td>{this.state.user_name}</td> */}
                             
                              <td>{this.state.savingsAccount.balance}</td>
-                             <td>{this.state.savingsAccount.openedOn}</td>
-                             <td><button className="btn btn-success">Deposit</button></td>
-                             <td><button className="btn btn-primary">Withdraw</button></td>
-                             <td><button className="btn btn-warning">Transfer</button></td>
-                             <td><button className="btn btn-danger">Delete</button></td>
+                             <td>{moment(this.state.savingsAccount.openedOn).format('YYYY-MM-DD')}</td>
+                             <td><button className="btn btn-success" onClick={this.handleDeposit} value={this.state.savingsAccount.id}>Deposit</button></td>
+                             <td><button className="btn btn-primary" onClick={this.handleWithdraw} value={this.state.savingsAccount.id}>Withdraw</button></td>
+                             <td><button className="btn btn-warning" onClick={this.handleTransfer} value={this.state.savingsAccount.id}>Transfer</button></td>
+                             <td><button className="btn btn-danger" onClick={this.handleDeleteAccount} value={this.state.savingsAccount.id}>Delete</button></td>
                            </tr>
                           }
                           {
+                            this.state.hasCDAccount && 
                             this.state.cdAccounts.map(
                               cdAcc => 
-                             <tr key={cdAcc.cdAccountId}>
-                               <td>CD Account</td>
-                               <td>{cdAcc.balance}</td>
-                               <td>{cdAcc.openedOn}</td>
-                               <td><button className="btn btn-success">Deposit</button></td>
-                             <td><button className="btn btn-primary">Withdraw</button></td>
-                             <td><button className="btn btn-warning">Transfer</button></td>
-                             <td><button className="btn btn-danger">Delete</button></td>
+                             <tr key={cdAcc.id}>
+                                <td>CD Account</td>
+                                <td>{cdAcc.balance}</td>
+                                <td>{moment(cdAcc.openedOn).format('YYYY-MM-DD')}</td>
+                                <td><button className="btn btn-success" disabled>Deposit</button></td>
+                                <td><button className="btn btn-primary" disabled>Withdraw</button></td>
+                                <td><button className="btn btn-warning" disabled>Transfer</button></td>
+                                <td><button className="btn btn-danger" onClick={this.handleDeleteAccount} value={cdAcc.id}>Delete</button></td>
                              </tr>
                             )
                           }
 
-
+                          {
+                            !(this.state.hasCheckingAccount) && <button className="btn btn-success" onClick={this.addCheckingButton}>Add Checking Account</button>
+                          }
+                          <hr/>
+                          { 
+                            !(this.state.hasSavingsAccount) &&  <button className="btn btn-success" onClick={this.addSavingsButton}>Add Savings Account</button>
+                          }
+                          <hr/>
+                          {
+                            <button className="btn btn-success" onClick={this.addCDButton}>Add CD Account</button>
+                          }
+                           
+                        
 
 
 

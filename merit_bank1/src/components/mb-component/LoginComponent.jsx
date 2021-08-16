@@ -77,7 +77,8 @@ class LoginComponent extends Component {
         .executeJwtAuthenticationService(this.state.username, this.state.password)
         .then((response) => {
               AuthenticationService.registerSuccessfulLoginForJwt(this.state.username, response.data.token );
-              this.props.history.push(`/welcome/${this.state.username}`)    
+              //this.props.history.push(`/welcome/${this.state.username}`)   
+              this.props.history.push(`/todos`)   
             }
         ).catch( () => 
         this.setState(
@@ -109,6 +110,7 @@ class LoginComponent extends Component {
               User Name : <input type="text" name="username" value={this.state.username} onChange={this.handleChange}/> <br/><br/>
               Password : <input type="password" name="password" value={this.state.password} onChange={this.handleChange}/> <br/><br/>
               <button className="btn btn-success" onClick={this.handleLoginButton}>Login</button>
+              &nbsp;
               <button className="btn btn-success" onClick={this.handleRegisterButton}>New User ?</button>
             </div>
         </div>

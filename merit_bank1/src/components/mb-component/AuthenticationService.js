@@ -59,6 +59,10 @@ class AuthenticationService {
         return true;
     }
 
+    getLoggedInUsername(){
+        return sessionStorage.getItem(USER_NAME_SESSION_ATTRIBUTE_NAME);
+    }
+
     setupAxiosInterceptors(token) {
 
        
